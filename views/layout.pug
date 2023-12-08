@@ -1,0 +1,15 @@
+doctype html
+html(lang='en')
+  head
+    title= `Members Only :: ${title}`
+    link(rel='stylesheet', href='/style.css')
+  body
+    header 
+      h1 
+        a(href='/' class='nav-link') Members Only
+      nav 
+        a(href='/log-in' class='nav-link') Log In
+        a(href='/sign-up' class='nav-link') Sign Up
+    main 
+      h2= title
+      block content
