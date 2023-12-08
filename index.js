@@ -30,6 +30,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
 
+// temporary until favicon found
+app.get('/favicon.ico', (req, res) => res.status(204));
+
 // set up routes
 const router = express.Router();
 router.route('/')
