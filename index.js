@@ -4,6 +4,7 @@ const path = require("path");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const bcrypt = require('bcryptjs');
 const logger = require('morgan');
 
 const Member = require('./models/member');
@@ -37,9 +38,10 @@ passport.use(
       if (!member) {
         return done(null, false, { message: "Incorrect username" });
       };
-      if (member.password !== password) {
-        return done(null, false, { message: "Incorrect password" });
-      };
+      const match = await bcrypt.compare(password, member.password);
+      if (!match) {
+        return done(null, false, { message: "Incorrect password" })
+      }
       return done(null, member);
     } catch(err) {
       return done(err);

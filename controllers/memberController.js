@@ -2,6 +2,7 @@ const Member = require('../models/member');
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
 const passport = require('passport');
+const bcrypt = require('bcryptjs');
 
 exports.sign_up_get = (req, res, next) => {
   res.render('sign-up', { title: 'Sign Up' })
@@ -16,8 +17,7 @@ exports.sign_up_post = [
 
   body('password')
     .trim()
-    .notEmpty().withMessage('Please input a password.')
-    .escape(),
+    .notEmpty().withMessage('Please input a password.'),
   // todo: escaping a password can change it up? how to work around this?
 
   asyncHandler(async (req, res, next) => {
@@ -33,18 +33,16 @@ exports.sign_up_post = [
         errors: errorsArray
       });
     } else {
-      await Member.create({
-        username: req.body.username,
-        password: req.body.password
+      bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
+        if (err) return next(err);
+        await Member.create({
+          username: req.body.username,
+          password: hashedPassword
+        });
+        res.redirect('/log-in');
       });
-      next();
     }
   }),
-
-  passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/"
-  })
 ];
 
 exports.log_in_get = (req, res, next) => {
@@ -78,8 +76,8 @@ exports.log_in_post = [
   }),
 
   passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/"
+    successRedirect: '/',
+    failureRedirect: '/log-in'
   })
 ];
 
