@@ -1,3 +1,9 @@
 extends layout 
 
 block content 
+  form(method="post" action="") 
+    label(for="username") Username:  
+    input#username(name="username" type="text") 
+    label(for="password") Password:  
+    input#username(name="password" type="password") 
+    button(type="submit") Sign Up

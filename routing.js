@@ -4,6 +4,9 @@ const routing = express.Router();
 const Members = require('./models/member');
 const Messages = require('./models/message');
 
+const MemberController = require('./controllers/memberController');
+const MessageController = require('./controllers/messageController');
+
 routing.route('/')
   .get(async (req, res, next) => {
     const allMessages = await Messages.find({}).exec();
@@ -14,36 +17,18 @@ routing.route('/')
   });
 
 routing.route('/sign-up')
-  .get((req, res, next) => {
-    res.render('sign-up', { title: 'Sign Up' })
-  });
+  .get(MemberController.sign_up_get)
+  .post(MemberController.sign_up_post);
 
 routing.route('/log-in')
-  .get((req, res, next) => {
-    res.render('log-in', { title: 'Log In' })
-  });
-
-routing.route('/new-message')
-  .get((req, res, next) => {
-    res.render('new-message', { title: 'New Message' })
-  });
+  .get(MemberController.log_in_get)
+  .post(MemberController.log_in_post);
 
 routing.route('/member/:id')
-  .get(async (req, res, next) => {
-    let thisMember;
-    try { thisMember = await Members.findById(req.params.id) }
-    catch { thisMember = null };
+  .get(MemberController.member_get);
 
-    if (thisMember === null) {
-      const err = new Error('Member not found.');
-      err.status = 404;
-      return next(err);
-    } else {
-      res.render('member', {
-        title: `Viewing Member: ${thisMember.username}`,
-        member: thisMember
-      });
-    };
-  });
+routing.route('/new-message')
+  .get(MessageController.new_message_get)
+  .post(MessageController.new_message_post);
 
 module.exports = routing;
