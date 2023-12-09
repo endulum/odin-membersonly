@@ -64,3 +64,14 @@ label {
 button[type='submit'] {
   grid-column: 1 / 3;
 }
+
+.alert {
+  border: 1px solid crimson;
+  background: rgba(220, 20, 60, 0.25);
+  grid-column: 1 / 3;
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.25rem;
+}

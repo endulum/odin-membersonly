@@ -11,5 +11,5 @@ html(lang='en')
         a(href='/log-in' class='nav-link') Log In
         a(href='/sign-up' class='nav-link') Sign Up
     main 
-      h2= title
+      h2= title || 'Error'
       block content
