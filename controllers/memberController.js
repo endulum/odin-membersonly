@@ -1,6 +1,7 @@
 const Member = require('../models/member');
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const passport = require('passport');
 
 exports.sign_up_get = (req, res, next) => {
   res.render('sign-up', { title: 'Sign Up' })
@@ -32,12 +33,17 @@ exports.sign_up_post = [
         errors: errorsArray
       });
     } else {
-      // await Member.create({
-      //   username: req.body.username,
-      //   password: req.body.password
-      // });
-      res.redirect('/');
+      await Member.create({
+        username: req.body.username,
+        password: req.body.password
+      });
+      next();
     }
+  }),
+
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/"
   })
 ];
 
@@ -68,15 +74,27 @@ exports.log_in_post = [
         username: req.body.username,
         errors: errorsArray
       });
-    } else {
-      res.redirect('/');
-    }
+    } else { next() }
+  }),
+
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/"
   })
 ];
 
+exports.log_out_get = asyncHandler((req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
+});
+
 exports.member_get = asyncHandler(async (req, res, next) => {
   let thisMember;
-  try { thisMember = await Member.findById(req.params.id) }
+  try { thisMember = await Member.findOne({ username: req.params.username }) }
   catch { thisMember = null };
 
   if (thisMember === null) {
@@ -85,7 +103,7 @@ exports.member_get = asyncHandler(async (req, res, next) => {
     return next(err);
   } else {
     res.render('member', {
-      title: `Viewing Member: ${thisMember.username}`,
+      title: `${thisMember.username}`,
       member: thisMember
     });
   };

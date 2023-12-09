@@ -24,7 +24,10 @@ routing.route('/log-in')
   .get(MemberController.log_in_get)
   .post(MemberController.log_in_post);
 
-routing.route('/member/:id')
+routing.route('/log-out')
+  .get(MemberController.log_out_get);
+
+routing.route('/member/:username')
   .get(MemberController.member_get);
 
 routing.route('/new-message')

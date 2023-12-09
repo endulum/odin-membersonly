@@ -6,6 +6,8 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const logger = require('morgan');
 
+const Member = require('./models/member');
+
 // start dotenv
 const dotenv = require('dotenv');
 dotenv.config();
@@ -27,6 +29,37 @@ app.set('view engine', 'pug');
 // start the middleware chain
 app.use(logger('dev'));
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
+
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    try {
+      const member = await Member.findOne({ username: username });
+      if (!member) {
+        return done(null, false, { message: "Incorrect username" });
+      };
+      if (member.password !== password) {
+        return done(null, false, { message: "Incorrect password" });
+      };
+      return done(null, member);
+    } catch(err) {
+      return done(err);
+    };
+  })
+);
+
+passport.serializeUser((member, done) => {
+  done(null, member.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const member = await Member.findById(id);
+    done(null, member);
+  } catch(err) {
+    done(err);
+  };
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
@@ -34,6 +67,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // temporary until favicon found
 app.get('/favicon.ico', (req, res) => res.status(204));
+
+// store user locally
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
+  next();
+});
 
 // hook up routes
 const routing = require('./routing');
