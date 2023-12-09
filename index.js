@@ -1,3 +1,4 @@
+const createError = require('http-errors');
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
@@ -29,17 +30,28 @@ app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // temporary until favicon found
 app.get('/favicon.ico', (req, res) => res.status(204));
 
-// set up routes
-const router = express.Router();
-router.route('/')
-  .get((req, res, next) => {
-    res.send('Hello World')
+// hook up routes
+const routing = require('./routing');
+app.use('/', routing);
+
+// catch errors
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+app.use(function(err, req, res, next) {
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.status(err.status || 500);
+  res.render('error', {
+    title: err.status,
+    message: err.message
   });
-app.use('/', router);
+});
 
 // finally, start listening
 app.listen(3000, () => console.log("app listening on port 3000"));

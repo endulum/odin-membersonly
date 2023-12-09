@@ -1,4 +1,9 @@
 extends layout 
 
 block content 
-  
+  each message in messages 
+    div 
+      p= message.text
+  else 
+    p 
+      i There are no messages here right now.

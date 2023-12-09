@@ -2,12 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const MemberSchema = new Schema({
-  username: { type: string, required: true },
-  password: { type: string, required: true }
+  username: { type: String, required: true },
+  password: { type: String, required: true }
 });
 
-MemberSchema.virtual(url).get(function() {
+MemberSchema.virtual('url').get(function() {
   return `/member/${this._id}`;
 });
 
-module.exports = mongoose.model('Member', MemberSchema);
