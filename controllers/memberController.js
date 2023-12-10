@@ -17,15 +17,12 @@ exports.sign_up_post = [
 
   body('password')
     .trim()
-    .notEmpty().withMessage('Please input a password.'),
-  // todo: escaping a password can change it up? how to work around this?
+    .notEmpty().withMessage('Please input a password.')
+    .escape(),
+  // TODO: escaping a password can change it up? how to work around this?
 
   asyncHandler(async (req, res, next) => {
     const errorsArray = validationResult(req).array();
-    const existingMember = await Member.findOne({ username: req.body.username }).exec();
-    if (existingMember !== null) {
-      errorsArray.push({ msg: 'A member already exists with this username. Please choose another.' })
-    };
     if (errorsArray.length > 0) {
       res.render('sign-up', {
         title: 'Sign Up',
@@ -35,14 +32,45 @@ exports.sign_up_post = [
     } else {
       bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
         if (err) return next(err);
-        await Member.create({
+        const member = await Member.create({
           username: req.body.username,
           password: hashedPassword
         });
-        res.redirect('/log-in');
+        req.login(member, (err) => {
+          if (err) return next(err);
+          return res.redirect(`/member/${req.user.username}`)
+        });
       });
     }
   }),
+
+  // passport.authenticate("local", {
+  //   successRedirect: '/',
+  //   failureRedirect: '/log-in',
+  // })
+  // const errorsArray = validationResult(req).array();
+  // const existingMember = await Member.findOne({ username: req.body.username }).exec();
+  // if (existingMember !== null) {
+  //   errorsArray.push({ msg: 'A member already exists with this username. Please choose another.' })
+  // };
+  // if (errorsArray.length > 0) {
+  //   res.render('sign-up', {
+  //     title: 'Sign Up',
+  //     username: req.body.username,
+  //     errors: errorsArray
+  //   });
+  // } else {
+  //   bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
+  //     if (err) return next(err);
+  // await Member.create({
+  //   username: req.body.username,
+  //   password: hashedPassword
+  // });  
+  //     // TODO: how to successfully log in right after signing up?
+  //     res.redirect('/log-in');
+  //   });
+  // }
+  // }),
 ];
 
 exports.log_in_get = (req, res, next) => {
@@ -72,12 +100,15 @@ exports.log_in_post = [
         username: req.body.username,
         errors: errorsArray
       });
-    } else { next() }
+    } else {
+      next();
+    }
   }),
 
-  passport.authenticate("local", {
+  // TODO: what does this do exactly?
+  passport.authenticate('local', {
     successRedirect: '/',
-    failureRedirect: '/log-in'
+    failureRedirect: '/log-in',
   })
 ];
 

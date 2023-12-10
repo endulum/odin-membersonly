@@ -15,7 +15,7 @@ async function main() {
   const conn = await mongoose.connect(mongoDB);
   console.log(`Connected to database "${conn.connection.name}"`);
   await emptyMembers();
-  await populateMembers();
+  // await populateMembers();
   console.log(`Nothing left to do, closing connection.`);
   mongoose.connection.close();
 }

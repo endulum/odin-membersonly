@@ -31,6 +31,7 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
 
+// TODO: what does this thing do exactly?
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
@@ -88,6 +89,7 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   res.status(err.status || 500);
+  console.log(err.stack);
   res.render('error', {
     title: err.status,
     message: err.message
