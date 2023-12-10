@@ -9,9 +9,9 @@ exports.sign_up_get = (req, res, next) => {
 };
 
 exports.sign_up_post = [
-  body('username')
+  body('username', 'Please input a username.')
     .trim()
-    .notEmpty().withMessage('Please input a username.')
+    .isLength({ min: 1 }).withMessage('Please input a username.')
     .isAlphanumeric().withMessage('Username can only consist of letters and numbers.')
     .escape(),
 
@@ -23,6 +23,10 @@ exports.sign_up_post = [
 
   asyncHandler(async (req, res, next) => {
     const errorsArray = validationResult(req).array();
+    const existingMember = await Member.findOne({ username: req.body.username }).exec();
+    if (existingMember !== null) {
+      errorsArray.push({ msg: 'A member already exists with this username. Please choose another.' })
+    };
     if (errorsArray.length > 0) {
       res.render('sign-up', {
         title: 'Sign Up',
@@ -43,38 +47,22 @@ exports.sign_up_post = [
       });
     }
   }),
-
-  // passport.authenticate("local", {
-  //   successRedirect: '/',
-  //   failureRedirect: '/log-in',
-  // })
-  // const errorsArray = validationResult(req).array();
-  // const existingMember = await Member.findOne({ username: req.body.username }).exec();
-  // if (existingMember !== null) {
-  //   errorsArray.push({ msg: 'A member already exists with this username. Please choose another.' })
-  // };
-  // if (errorsArray.length > 0) {
-  //   res.render('sign-up', {
-  //     title: 'Sign Up',
-  //     username: req.body.username,
-  //     errors: errorsArray
-  //   });
-  // } else {
-  //   bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
-  //     if (err) return next(err);
-  // await Member.create({
-  //   username: req.body.username,
-  //   password: hashedPassword
-  // });  
-  //     // TODO: how to successfully log in right after signing up?
-  //     res.redirect('/log-in');
-  //   });
-  // }
-  // }),
 ];
 
 exports.log_in_get = (req, res, next) => {
-  res.render('log-in', { title: 'Log In' })
+  let loginErrors = [];
+  if (req.session.messages) {
+    req.session.messages.forEach(message => {
+      loginErrors.push({ msg: message })
+    });
+    req.session.messages = null;
+    // clearing out the messages might have an unintended effect?
+  };
+
+  res.render('log-in', {
+    title: 'Log In',
+    errors: loginErrors.length > 0 ? loginErrors : null
+  })
 };
 
 exports.log_in_post = [
@@ -90,10 +78,6 @@ exports.log_in_post = [
 
   asyncHandler(async (req, res, next) => {
     const errorsArray = validationResult(req).array();
-    const existingMember = await Member.findOne({ username: req.body.username }).exec();
-    if (existingMember === null) {
-      errorsArray.unshift({ msg: 'No members exist with that username.' })
-    };
     if (errorsArray.length > 0) {
       res.render('log-in', {
         title: 'Log In',
@@ -109,6 +93,7 @@ exports.log_in_post = [
   passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/log-in',
+    failureMessage: true,
   })
 ];
 

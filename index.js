@@ -37,11 +37,11 @@ passport.use(
     try {
       const member = await Member.findOne({ username: username });
       if (!member) {
-        return done(null, false, { message: "Incorrect username" });
+        return done(null, false, { message: "Incorrect username or password." });
       };
       const match = await bcrypt.compare(password, member.password);
       if (!match) {
-        return done(null, false, { message: "Incorrect password" })
+        return done(null, false, { message: "Incorrect username or password." })
       }
       return done(null, member);
     } catch(err) {
