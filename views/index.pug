@@ -1,9 +1,18 @@
 extends layout 
 
 block content 
-  each message in messages 
-    div 
-      p= message.text
-  else 
-    p 
-      i There are no messages here right now.
+  div.messages
+    each message in messages 
+      div.message 
+        small.message-details 
+          | On #{message.date_formatted}, 
+          if (currentUser)
+            b
+              a(href=message.author.url class='nav-link')= message.author.username
+          else 
+            b= "an anonymous member"
+          |  wrote:
+        p.message-text= message.text
+    else 
+      p 
+        i There are no messages here right now.

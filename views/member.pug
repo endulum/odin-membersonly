@@ -1,3 +1,21 @@
 extends layout 
 
 block content 
+  if member.isVerified 
+    p.paragraph
+      b= member.username  
+      |  is verified. 
+    if currentUser 
+      p.paragraph Here are their messages.
+      div.messages
+        each message in messages 
+          div.message 
+            small.message-details 
+              | On #{message.date_formatted}, this member wrote:
+            p.message-text= message.text
+    else 
+      p You must be logged in to see members' messages.
+  else 
+    p.paragraph 
+      b= member.username 
+      |  is not verified.

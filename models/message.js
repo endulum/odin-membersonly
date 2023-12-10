@@ -9,8 +9,8 @@ const MessageSchema = new Schema({
   date: { type: Date, required: true, default: Date.now }
 });
 
-MessageSchema.virtual('date-formatted').get(function() {
-  return DateTime.fromJSDate(this.date).toLocaleString(DateTime.DATE_MED);
+MessageSchema.virtual('date_formatted').get(function() {
+  return DateTime.fromJSDate(this.date).toLocaleString({ month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 });
 
 module.exports = mongoose.model('Message', MessageSchema);

@@ -1,4 +1,5 @@
 const Member = require('../models/member');
+const Message = require('../models/message');
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
 const passport = require('passport');
@@ -116,9 +117,11 @@ exports.member_get = asyncHandler(async (req, res, next) => {
     err.status = 404;
     return next(err);
   } else {
+    const thisMembersMessages = await Message.find({ author: thisMember });
     res.render('member', {
       title: `${thisMember.username}`,
-      member: thisMember
+      member: thisMember,
+      messages: thisMembersMessages
     });
   };
 });
