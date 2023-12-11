@@ -33,6 +33,11 @@ block content
     else 
       if currentUser===member.username
         p.paragraph You are not verified.
+        p.paragraph To verify yourself, enter the secret passcode.
+        form(method='POST' action='')
+          label(for='passcode') Passcode: 
+          input#passcode(name='passcode' type='text')
+          button(type="submit") Submit
       else
         p.paragraph You must be verified to see member information.
   else 

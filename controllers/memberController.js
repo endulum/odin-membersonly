@@ -125,3 +125,35 @@ exports.member_get = asyncHandler(async (req, res, next) => {
     });
   };
 });
+
+exports.member_post = [
+  body('passcode')
+    .trim()
+    .escape(),
+
+  asyncHandler(async (req, res, next) => {
+    let thisMember;
+    try { thisMember = await Member.findOne({ username: req.params.username }) }
+    catch { thisMember = null };
+
+    if (thisMember === null) {
+      const err = new Error('Member not found.');
+      err.status = 404;
+      return next(err);
+    }
+    
+    if (req.body.passcode === 'ilovecomputers') {
+      thisMember.isVerified = true;
+      await thisMember.save();
+      res.redirect(`/member/${thisMember.username}`)
+    } else {
+      res.render('member', {
+        title: `${thisMember.username}`,
+        member: thisMember,
+        messages: thisMembersMessages,
+        wrongPasscode: true
+      })
+    }
+    // res.redirect(`/member/${res.locals.currentUser}`);
+  })
+]

@@ -28,7 +28,8 @@ routing.route('/log-out')
   .get(MemberController.log_out_get);
 
 routing.route('/member/:username')
-  .get(MemberController.member_get);
+  .get(MemberController.member_get)
+  .post(MemberController.member_post);
 
 routing.route('/new-message')
   .get(MessageController.new_message_get)
