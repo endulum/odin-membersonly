@@ -35,4 +35,8 @@ routing.route('/new-message')
   .get(MessageController.new_message_get)
   .post(MessageController.new_message_post);
 
+routing.route('/delete/:id')
+  .get(MessageController.delete_message_get)
+  .post(MessageController.delete_message_post);
+
 module.exports = routing;

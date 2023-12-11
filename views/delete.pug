@@ -1,0 +1,25 @@
+extends layout 
+
+block content 
+  if currentUserIsAdmin
+    p.paragraph You are about to delete this message: 
+    div.messages 
+      div.message 
+        small.message-details 
+          if currentUser===message.author.username 
+            | On #{message.date_formatted}, you wrote:
+          else
+            | On #{message.date_formatted}, 
+            b
+              a(href=message.author.url class='nav-link')= message.author.username
+        p.message-text= message.text
+    br
+    form(action="", method="post") 
+      input(
+        type='hidden'
+        name='message_id'
+        value=message._id
+      )
+      button(type="submit") Confirm Deletion
+  else 
+    p.paragraph You must have admin status to delete messages.

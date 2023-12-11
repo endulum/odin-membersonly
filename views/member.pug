@@ -20,6 +20,9 @@ block content
                   else
                     | On #{message.date_formatted}, this member wrote:
                 p.message-text= message.text
+                if currentUserIsAdmin 
+                  small.message-details 
+                    a(href=`/delete/${message._id}` class='nav-link') Delete Message
         else 
           p.paragraph 
             if currentUser===member.username

@@ -9,18 +9,22 @@ block content
       p.paragraph You must be verified to send messages and see the authors of messages.
   else
     p.paragraph You must be logged in and verified to send messages and see the authors of messages.
-  div.messages
-    each message in messages 
-      div.message 
-        small.message-details 
-          | On #{message.date_formatted}, 
-          if currentUser && currentUserIsVerified
-            b
-              a(href=message.author.url class='nav-link')= message.author.username
-          else 
-            b= "an anonymous member"
-          |  wrote:
-        p.message-text= message.text
-    else 
-      p 
-        i There are no messages here right now.
+  if messages.length > 0
+    div.messages
+      each message in messages 
+        div.message 
+          small.message-details 
+            | On #{message.date_formatted}, 
+            if currentUser && currentUserIsVerified
+              b
+                a(href=message.author.url class='nav-link')= message.author.username
+            else 
+              b= "an anonymous member"
+            |  wrote:
+          p.message-text= message.text
+          if currentUserIsAdmin 
+            small.message-details 
+              a(href=`/delete/${message._id}` class='nav-link') Delete Message
+  else 
+    p 
+      i There are no messages here right now.

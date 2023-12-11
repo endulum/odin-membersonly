@@ -49,3 +49,35 @@ exports.new_message_post = [
     }
   })
 ]
+
+exports.delete_message_get = asyncHandler(async (req, res, next) => {
+  let thisMessage;
+  try { thisMessage = await Message.findById(req.params.id).populate('author').exec() }
+  catch { thisMessage = null }
+
+  if (thisMessage === null) {
+    const err = new Error('Message not found.');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('delete', {
+    title: 'Delete Message',
+    message: thisMessage
+  });
+});
+
+exports.delete_message_post = asyncHandler(async (req, res, next) => {
+  let thisMessage;
+  try { thisMessage = await Message.findById(req.body.message_id).populate('author').exec() }
+  catch { thisMessage = null }
+
+  if (thisMessage === null) {
+    const err = new Error('Message not found.');
+    err.status = 404;
+    return next(err);
+  } else {
+    await Message.findByIdAndDelete(req.body.message_id).exec();
+    res.redirect('/');
+  }
+})

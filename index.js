@@ -75,6 +75,7 @@ app.get('/favicon.ico', (req, res) => res.status(204));
 app.use((req, res, next) => {
   res.locals.currentUser = req.user?.username;
   res.locals.currentUserIsVerified = req.user?.isVerified;
+  res.locals.currentUserIsAdmin = req.user?.isAdmin;
   // console.log(res.locals);
   next();
 });
