@@ -6,7 +6,11 @@ const passport = require('passport');
 const bcrypt = require('bcryptjs');
 
 exports.sign_up_get = (req, res, next) => {
-  res.render('sign-up', { title: 'Sign Up' })
+  if (res.locals.currentUser) {
+    res.redirect('/');
+  } else {
+    res.render('sign-up', { title: 'Sign Up' });
+  }
 };
 
 exports.sign_up_post = [
@@ -29,47 +33,55 @@ exports.sign_up_post = [
     .escape(),
 
   asyncHandler(async (req, res, next) => {
-    const errorsArray = validationResult(req).array();
-    const existingMember = await Member.findOne({ username: req.body.username }).exec();
-    if (existingMember !== null) {
-      errorsArray.push({ msg: 'A member already exists with this username. Please choose another.' })
-    };
-    if (errorsArray.length > 0) {
-      res.render('sign-up', {
-        title: 'Sign Up',
-        username: req.body.username,
-        errors: errorsArray
-      });
+    if (res.locals.currentUser) {
+      res.redirect('/');
     } else {
-      bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
-        if (err) return next(err);
-        const member = await Member.create({
+      const errorsArray = validationResult(req).array();
+      const existingMember = await Member.findOne({ username: req.body.username }).exec();
+      if (existingMember !== null) {
+        errorsArray.push({ msg: 'A member already exists with this username. Please choose another.' })
+      };
+      if (errorsArray.length > 0) {
+        res.render('sign-up', {
+          title: 'Sign Up',
           username: req.body.username,
-          password: hashedPassword
+          errors: errorsArray
         });
-        req.login(member, (err) => {
+      } else {
+        bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
           if (err) return next(err);
-          return res.redirect(`/member/${req.user.username}`)
+          const member = await Member.create({
+            username: req.body.username,
+            password: hashedPassword
+          });
+          req.login(member, (err) => {
+            if (err) return next(err);
+            return res.redirect(`/member/${req.user.username}`)
+          });
         });
-      });
+      }
     }
   }),
 ];
 
 exports.log_in_get = (req, res, next) => {
-  let loginErrors = [];
-  if (req.session.messages) {
-    req.session.messages.forEach(message => {
-      loginErrors.push({ msg: message })
-    });
-    req.session.messages = null;
-    // clearing out the messages might have an unintended effect?
-  };
+  if (res.locals.currentUser) {
+    res.redirect('/');
+  } else {
+    let loginErrors = [];
+    if (req.session.messages) {
+      req.session.messages.forEach(message => {
+        loginErrors.push({ msg: message })
+      });
+      req.session.messages = null;
+      // clearing out the messages might have an unintended effect?
+    };
 
-  res.render('log-in', {
-    title: 'Log In',
-    errors: loginErrors.length > 0 ? loginErrors : null
-  })
+    res.render('log-in', {
+      title: 'Log In',
+      errors: loginErrors.length > 0 ? loginErrors : null
+    })
+  }
 };
 
 exports.log_in_post = [
@@ -84,15 +96,19 @@ exports.log_in_post = [
     .escape(),
 
   asyncHandler(async (req, res, next) => {
-    const errorsArray = validationResult(req).array();
-    if (errorsArray.length > 0) {
-      res.render('log-in', {
-        title: 'Log In',
-        username: req.body.username,
-        errors: errorsArray
-      });
+    if (res.locals.currentUser) {
+      res.redirect('/');
     } else {
-      next();
+      const errorsArray = validationResult(req).array();
+      if (errorsArray.length > 0) {
+        res.render('log-in', {
+          title: 'Log In',
+          username: req.body.username,
+          errors: errorsArray
+        });
+      } else {
+        next();
+      }
     }
   }),
 
@@ -147,7 +163,7 @@ exports.member_post = [
       err.status = 404;
       return next(err);
     }
-    
+
     if (req.body.passcode === 'ilovecomputers') {
       thisMember.isVerified = true;
       await thisMember.save();
