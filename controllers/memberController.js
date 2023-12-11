@@ -12,13 +12,13 @@ exports.sign_up_get = (req, res, next) => {
 exports.sign_up_post = [
   body('username', 'Please input a username.')
     .trim()
-    .isLength({ min: 1 }).withMessage('Please input a username.')
+    .isLength({ min: 1, max: 32 }).withMessage('Usernames must be between 1 and 32 characters long.')
     .isAlphanumeric().withMessage('Username can only consist of letters and numbers.')
     .escape(),
 
   body('password')
     .trim()
-    .notEmpty().withMessage('Please input a password.')
+    .isLength({ min: 8, max: 64 }).withMessage('Passwords must be between 8 and 64 characters long.')
     .escape(),
   // TODO: escaping a password can change it up? how to work around this?
 

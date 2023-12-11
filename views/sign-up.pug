@@ -3,9 +3,19 @@ extends layout
 block content 
   form(method="post" action="") 
     label(for="username") Username:  
-    input#username(name="username" type="text" value=username || '') 
+    input#username(
+      name="username" 
+      type="text" value=username || ''
+      required=true 
+      maxLength=32
+    ) 
     label(for="password") Password:  
-    input#password(name="password" type="password") 
+    input#password(
+      name="password" 
+      type="password"
+      required=true 
+      maxLength=64
+    ) 
     if errors && errors.length > 0
       .alert 
         each error in errors 
