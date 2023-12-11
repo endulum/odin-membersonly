@@ -6,7 +6,7 @@ block content
       div.message 
         small.message-details 
           | On #{message.date_formatted}, 
-          if (currentUser)
+          if currentUser && currentUserIsVerified
             b
               a(href=message.author.url class='nav-link')= message.author.username
           else 

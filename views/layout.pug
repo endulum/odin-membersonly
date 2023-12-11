@@ -10,7 +10,7 @@ html(lang='en')
       nav 
         if currentUser 
           p Logged in as 
-            a(href=`/member/${currentUser.username}` class='nav-link') #{currentUser.username}
+            a(href=`/member/${currentUser}` class='nav-link') #{currentUser}
           a(href='/log-out' class='nav-link') Log Out
         else
           a(href='/log-in' class='nav-link') Log In

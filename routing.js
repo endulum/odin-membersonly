@@ -10,7 +10,6 @@ const MessageController = require('./controllers/messageController');
 routing.route('/')
   .get(async (req, res, next) => {
     const allMessages = await Messages.find({}).populate('author').exec();
-    console.log(allMessages);
     res.render('index', { 
       title: 'Messages',
       messages: allMessages,
