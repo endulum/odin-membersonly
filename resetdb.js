@@ -1,6 +1,8 @@
 const Member = require('./models/member');
 const Message = require('./models/message');
 
+const bcrypt = require('bcryptjs');
+
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 
@@ -11,15 +13,35 @@ const mongoDB = process.env.MONGO;
 
 main().catch(e => console.log(e));
 
-async function main() { 
-  console.log(`Connecting with URL "${mongoDB}"`);
-  const conn = await mongoose.connect(mongoDB);
-  console.log(`Connected to database "${conn.connection.name}"`);
-  await emptyMessages();
-  await emptyMembers();
-  await populateMembers();
-  console.log(`Nothing left to do, closing connection.`);
-  mongoose.connection.close();
+async function main() {
+  bcrypt.hash('someone', 10, async (err, hashedPassword) => {
+    console.log(`Connecting with URL "${mongoDB}"`);
+    const conn = await mongoose.connect(mongoDB);
+    console.log(`Connected to database "${conn.connection.name}"`);
+    await emptyMessages();
+    await emptyMembers();
+
+    console.log('Creating dummy user and messages...')
+
+    const member = await Member.create({
+      username: 'someone',
+      password: hashedPassword,
+      isVerified: true
+    });
+
+    await Message.create({
+      author: member,
+      text: 'Lorem ipsum dolor sit amet.'
+    });
+
+    await Message.create({
+      author: member,
+      text: 'Consectetur adipscing elit.'
+    });
+
+    console.log(`Nothing left to do, closing connection.`);
+    mongoose.connection.close();
+  })
 }
 
 async function emptyMessages() {
@@ -38,22 +60,4 @@ async function emptyMembers() {
     console.log(`Found ${members} members. Deleting...`);
     await Member.deleteMany({});
   }
-}
-
-async function populateMembers() {
-  const someone = await Member.create({
-    username: 'someone',
-    password: 'someone',
-    isVerified: true
-  });
-
-  await Message.create({
-    author: someone,
-    text: 'Lorem ipsum dolor sit amet.'
-  });
-
-  await Message.create({
-    author: someone,
-    text: 'Consectetur adipscing elit.'
-  });
 }
