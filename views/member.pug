@@ -37,7 +37,14 @@ block content
         p.paragraph To verify yourself, enter the secret passcode.
         form(method='POST' action='')
           label(for='passcode') Passcode: 
-          input#passcode(name='passcode' type='text')
+          input#passcode(
+            name='passcode' 
+            type='password'
+            required=true
+          )
+          if wrongPasscode 
+            .alert 
+              p Incorrect passcode.
           button(type="submit") Submit
       else
         p.paragraph You must be verified to see member information.

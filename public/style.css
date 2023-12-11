@@ -54,7 +54,7 @@ h2 {
 
 form {
   display: grid;
-  grid-template-columns: repeat(2, min-content);
+  grid-template-columns: repeat(2, max-content);
   gap: 0.5rem;
 }
 

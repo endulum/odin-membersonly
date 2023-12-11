@@ -18,9 +18,15 @@ exports.sign_up_post = [
 
   body('password')
     .trim()
-    .isLength({ min: 8, max: 64 }).withMessage('Passwords must be between 8 and 64 characters long.')
+    .isLength({ min: 8, max: 64 }).withMessage('Password must be between 8 and 64 characters long.')
     .escape(),
-  // TODO: escaping a password can change it up? how to work around this?
+
+  body('confirm-password')
+    .trim()
+    .custom((value, { req }) => {
+      return value === req.body.password;
+    }).withMessage('Passwords do not match.')
+    .escape(),
 
   asyncHandler(async (req, res, next) => {
     const errorsArray = validationResult(req).array();
@@ -147,6 +153,7 @@ exports.member_post = [
       await thisMember.save();
       res.redirect(`/member/${thisMember.username}`)
     } else {
+      const thisMembersMessages = await Message.find({ author: thisMember });
       res.render('member', {
         title: `${thisMember.username}`,
         member: thisMember,

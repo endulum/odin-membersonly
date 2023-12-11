@@ -16,6 +16,13 @@ block content
       required=true 
       maxLength=64
     ) 
+    label(for="confirm-password") Confirm Password:  
+    input#confirm-password(
+      name="confirm-password" 
+      type="password"
+      required=true 
+      maxLength=64
+    ) 
     if errors && errors.length > 0
       .alert 
         each error in errors 
