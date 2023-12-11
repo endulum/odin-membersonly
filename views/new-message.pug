@@ -1,3 +1,16 @@
 extends layout 
 
 block content 
+  if currentUser 
+    if currentUserIsVerified 
+      form(action="", method="post") 
+        textarea(name='new-message')
+        if errors && errors.length > 0
+          .alert 
+            each error in errors 
+              p= error.msg
+        button(type="submit") Send
+    else 
+      p.paragraph You must be verified to send messages.
+  else 
+    p.paragraph You must be logged in and verified to send messages.

@@ -1,6 +1,14 @@
 extends layout 
 
 block content 
+  if currentUser 
+    if currentUserIsVerified 
+      p.paragraph Welcome to the Members Only message board. 
+        a(href='/new-message' class='nav-link') Send a new message.
+    else
+      p.paragraph You must be verified to send messages and see the authors of messages.
+  else
+    p.paragraph You must be logged in and verified to send messages and see the authors of messages.
   div.messages
     each message in messages 
       div.message 

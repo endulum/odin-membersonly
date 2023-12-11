@@ -23,9 +23,10 @@ block content
         else 
           p.paragraph 
             if currentUser===member.username
-              i You haven't written any messages yet.
+              | You haven't written any messages yet. 
+              a(href='/new-message' class='nav-link') Send a new message.
             else 
-              i This member hasn't written any messages yet.
+              | This member hasn't written any messages yet.
       else 
         p.paragraph 
           b= member.username 
