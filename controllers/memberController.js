@@ -5,6 +5,11 @@ const { body, validationResult } = require("express-validator");
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
 
+const dotenv = require('dotenv');
+dotenv.config();
+
+const verificationCode = process.env.PASS;
+
 exports.sign_up_get = (req, res, next) => {
   if (res.locals.currentUser) {
     res.redirect('/');
@@ -164,7 +169,7 @@ exports.member_post = [
       return next(err);
     }
 
-    if (req.body.passcode === 'ilovecomputers') {
+    if (req.body.passcode === verificationCode) {
       thisMember.isVerified = true;
       await thisMember.save();
       res.redirect(`/member/${thisMember.username}`)
@@ -177,6 +182,5 @@ exports.member_post = [
         wrongPasscode: true
       })
     }
-    // res.redirect(`/member/${res.locals.currentUser}`);
   })
 ]

@@ -10,7 +10,20 @@ block content
           p.paragraph 
             b= member.username 
             |  is verified.
+        if member.isAdmin 
+          if currentUser===member.username 
+            p.paragraph You are an admin, and are able to delete messages.
+          else 
+            p.paragraph 
+              b= member.username 
+              |  is an admin, and is able to delete messages.
         if messages.length > 0
+          if currentUser===member.username 
+            p.paragraph You have sent the following messages:
+          else
+            p.paragraph 
+              b= member.username
+              |  has sent the following messages:
           div.messages
             each message in messages 
               div.message 

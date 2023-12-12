@@ -6,6 +6,8 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require('bcryptjs');
 const logger = require('morgan');
+const compression = require("compression");
+const helmet = require("helmet");
 
 const Member = require('./models/member');
 
@@ -22,6 +24,18 @@ async function main() { await mongoose.connect(mongoDB) }
 
 // start the app
 const app = express();
+
+// Set up rate limiter: maximum of twenty requests per minute
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 60,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
+
+// helmet
+app.use(helmet());
 
 // get views from the 'views' directory
 app.set('views', path.join(__dirname, 'views'));
@@ -66,6 +80,9 @@ passport.deserializeUser(async (id, done) => {
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(compression());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // temporary until favicon found

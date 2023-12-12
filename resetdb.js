@@ -10,11 +10,12 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const mongoDB = process.env.MONGO;
+const pass = process.env.PASS;
 
 main().catch(e => console.log(e));
 
 async function main() {
-  bcrypt.hash('password', 10, async (err, hashedPassword) => {
+  bcrypt.hash(pass, 10, async (err, hashedPassword) => {
     console.log(`Connecting with URL "${mongoDB}"`);
     const conn = await mongoose.connect(mongoDB);
     console.log(`Connected to database "${conn.connection.name}"`);
@@ -23,29 +24,18 @@ async function main() {
 
     console.log('Creating admin account...');
 
-    await Member.create({
+    const admin = await Member.create({
       username: 'admin',
       password: hashedPassword,
       isVerified: true,
       isAdmin: true
     });
 
-    console.log('Creating dummy user and messages...')
-
-    const member = await Member.create({
-      username: 'someone',
-      password: hashedPassword,
-      isVerified: true
-    });
+    console.log('Creating message...')
 
     await Message.create({
-      author: member,
-      text: 'Lorem ipsum dolor sit amet.'
-    });
-
-    await Message.create({
-      author: member,
-      text: 'Consectetur adipscing elit.'
+      author: admin,
+      text: 'Hello, World'
     });
 
     console.log(`Nothing left to do, closing connection.`);
